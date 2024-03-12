@@ -74,13 +74,21 @@ function oauthSignIn() {
     form.setAttribute('action', oauth2Endpoint);
   
     // Parameters to pass to OAuth 2.0 endpoint.
+    // var params = {'client_id': clientId,
+    //               'redirect_uri': 'http://127.0.0.1:5500/index.html',
+    //               'response_type': 'token',
+    //               'scope': 'https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly https://www.googleapis.com/auth/spreadsheets',
+    //               'include_granted_scopes': 'true',
+    //               'state': 'pass-through value'};
+  
+    // Parameters to pass to OAuth 2.0 endpoint.
     var params = {'client_id': clientId,
-                  'redirect_uri': 'http://127.0.0.1:5500/index.html',
+                  'redirect_uri': 'https://ansoniatech.github.io/',
                   'response_type': 'token',
                   'scope': 'https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly https://www.googleapis.com/auth/spreadsheets',
                   'include_granted_scopes': 'true',
                   'state': 'pass-through value'};
-  
+
     console.log("Sending authentication request to Google:");
 
     // Add form parameters as hidden input values.
