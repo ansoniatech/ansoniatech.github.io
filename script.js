@@ -8,6 +8,8 @@ var spreadsheetId = "1wVnZ-ikLlnOH0Lq78cNkp30wW3ukTicgZedR_fmJEXA";
 var templateSheetId = "982309210";
 var currentSheetId = "";
 var currentSheetName = "";
+var devices = [];
+var matches = [];
 
 function insertBefore(referenceNode, newNode) {
 
@@ -39,6 +41,8 @@ function onLoad() {
         localStorage.setItem("accessToken", accessTokenInURL);
         window.location = window.location.pathname;
     }
+
+    getChromebookList();
 
 }
 
@@ -102,34 +106,29 @@ function oauthSignIn() {
 // Populates some of the data of a label using a device's id
 function populateById(label, id) {
 
+    var id = label.children[0].children[3].children[1].value;
+
     console.log("Searching for Chromebook by this ID: " + id);
 
-    // Authentication
-    var myHeaders = new Headers();
-    var authString = "Bearer " + localStorage.getItem("accessToken");
-    myHeaders.append("Authorization", authString);
+    matches = []; // Resets match array
 
-    // Settings for GET request
-    var requestOptions = {
-        method: 'GET',
-        headers: myHeaders,
-        redirect: 'follow'
-    };
+    for (var i = 0; i < devices.length; i++) {
 
-    var url = "https://admin.googleapis.com/admin/directory/v1/customer/C03ea4clo/devices/chromeos/" + id;
+        if (devices[i][1] == id) {
+            matches.push(devices[i]); // Adds device as a match for the asset-id
+        }
 
-    // Retrieves device info for a chromebook in the console, converts it to JSON, and fills form data
-    fetch(url, requestOptions)
-    .then(response => response.json())
-    .then(result => {
-        label.children[0].children[1].children[1].value = result.model;
-        label.children[0].children[3].children[1].value = result.annotatedAssetId;
-        label.children[0].children[4].children[1].value = result.serialNumber;
-        // console.log(result);
-        console.log("Success!");
-    })
-    .catch(error => console.log('error', error));
+    }
 
+    if (matches.length > 0) { // Checks if there are any matches
+
+        label.children[0].children[1].children[1].value = matches[0][0];
+        label.children[0].children[3].children[1].value = matches[0][1];
+        label.children[0].children[4].children[1].value = matches[0][2];
+    
+    } else {
+        console.log("No Matching Chromebooks");
+    }
 }
 
 // Retrieves a list of all Chromebooks
@@ -151,21 +150,40 @@ function getChromebookList() {
 
     var url = "https://admin.googleapis.com/admin/directory/v1/customer/C03ea4clo/devices/chromeos/";
 
-    var devices = []; // An array to populate with JSON objects
+    devices = []; // A global array to populate with JSON objects
 
-    // Retrieves a list of all Chrome devices
-    fetch(url, requestOptions)
-    .then(response => response.json())
-    .then(result => {
-        console.log(result);
-    })
-    .catch(error => console.log('error', error));
-
-    console.log(devices.length);
-
-    return devices;
-
+    getChromebookPage(url, requestOptions) // Recursively gets paginated list of Chromebooks
+    
 }
+
+// Retrieves a single page of information
+function getChromebookPage(
+    url,
+    requestOptions,
+    pageToken = ""
+  ) {
+    return fetch(`${url}${pageToken}`, requestOptions) // Append the page token to the base URL
+      .then(response => response.json())
+      .then(result => {
+
+        var chromebooks = result.chromeosdevices; // Gets Chromebook list from the result
+
+        // Runs through all chromebooks in one page and adds their model, asset-id, and serial number to an array
+        for (var i = 0; i < chromebooks.length; i++) {
+
+            devices.push([chromebooks[i].model,chromebooks[i].annotatedAssetId,chromebooks[i].serialNumber]);
+
+        }
+
+        if (result.nextPageToken) {
+            return getChromebookPage(url, requestOptions, ("?pageToken=" + result.nextPageToken));
+        }
+
+        console.log(devices.length);
+        console.log(devices);
+      })
+      .catch(error => console.log('error', error));
+  }
 
 // Exports data to the Google Sheet
 function exportToSheets() {

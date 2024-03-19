@@ -1,8 +1,7 @@
+Add Drop Down from API or Method of Selecting Matches
 
-Populate Sheet Feature
+Add Automatic Searching (no lookup button)
 
-Post to Github and fix authentication link on Google API Cloud
+Add Loading Message for Asset Loading
 
-Add Drop Down from API
-
-Add error messages for failures
+Add Error Messages for User
