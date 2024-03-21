@@ -155,12 +155,12 @@ function populateById(label) {
         }
 
         // Sets the dropdown value to the last chromebook in matches
-        select.value = select.lastChild.value;
+        select.value = select.firstChild.value;
 
-        // Chooses the last Chromebook in matches (most likely to be the correct one)
-        label.children[0].children[1].children[1].value = matches[currentLabelNumber][matches[currentLabelNumber].length - 1][0];
-        label.children[0].children[3].children[1].value = matches[currentLabelNumber][matches[currentLabelNumber].length - 1][1];
-        label.children[0].children[4].children[1].value = matches[currentLabelNumber][matches[currentLabelNumber].length - 1][2];
+        // Chooses the first Chromebook in matches (most likely to be the correct one)
+        label.children[0].children[1].children[1].value = matches[currentLabelNumber][0][0];
+        label.children[0].children[3].children[1].value = matches[currentLabelNumber][0][1];
+        label.children[0].children[4].children[1].value = matches[currentLabelNumber][0][2];
 
     } else if (matches[currentLabelNumber].length > 0) { // Checks if there are any matches
 
@@ -259,7 +259,7 @@ function getChromebookList() {
         redirect: 'follow'
     };
 
-    var url = "https://admin.googleapis.com/admin/directory/v1/customer/C03ea4clo/devices/chromeos/";
+    var url = "https://admin.googleapis.com/admin/directory/v1/customer/C03ea4clo/devices/chromeos?OrderBy=LAST_SYNC&maxResults=1000";
 
     devices = []; // A global array to populate with JSON objects
 
@@ -287,11 +287,10 @@ function getChromebookPage(
         }
 
         if (result.nextPageToken) {
-            return getChromebookPage(url, requestOptions, ("?pageToken=" + result.nextPageToken));
+            return getChromebookPage(url, requestOptions, ("&pageToken=" + result.nextPageToken));
         }
 
-        console.log(devices.length);
-        console.log(devices);
+        console.log("Chromebook list has been loaded (" + devices.length + " total)");
       })
       .catch(error => console.log('error', error));
   }
