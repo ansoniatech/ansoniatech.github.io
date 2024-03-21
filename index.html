@@ -37,7 +37,10 @@
                         <p>Asset ID</p>
                         <input id="asset-id" oninput="populateById(this.parentNode.parentNode.parentNode)" placeholder="CB-123-45">
 
-                        <button type="button" onclick="populateById(this.parentNode.parentNode.parentNode)">Look Up By Id</button>
+                        <div class="asset-id-dropdown" id="asset-id-dropdown">
+                            <select name="id-select" onChange="updateDropdownId(this.parentNode.parentNode.parentNode.parentNode, this.value)" id="id-select">
+                            </select>
+                        </div>
                     </li>
                     <li>
                         <p>S/N</p>

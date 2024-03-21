@@ -162,6 +162,8 @@ button:hover {
     height: 70px;
 }
 
+/* Form */
+
 .flex-outer {
     margin: 0px;
     padding: 0px;
@@ -204,6 +206,11 @@ select:-webkit-autofill:focus {
     -webkit-background-clip: text;
     -webkit-text-fill-color: var(--text-color);
     caret-color: var(--text-color)
+}
+
+.asset-id-dropdown {
+    display: none;
+    position: relative;
 }
 
 /* Scrollbar */

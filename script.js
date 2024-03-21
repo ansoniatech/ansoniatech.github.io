@@ -111,25 +111,62 @@ function oauthSignIn() {
 // Populates some of the data of a label using a device's id
 function populateById(label) {
 
+    resetDropdown(label);
+
+    var currentLabelId = label.id;
+    var currentLabelNumber = currentLabelId.replace("label",'');
+
     var id = label.children[0].children[3].children[1].value;
 
     console.log("Searching for Chromebook by this ID: " + id);
 
-    matches = []; // Resets match array
+    matches[currentLabelNumber] = []; // Resets match array for label
 
     for (var i = 0; i < devices.length; i++) {
 
         if (devices[i][1] == id) {
-            matches.push(devices[i]); // Adds device as a match for the asset-id
+            matches[currentLabelNumber].push(devices[i]); // Adds device as a match for the asset-id
         }
 
     }
 
-    if (matches.length > 0) { // Checks if there are any matches
+    if (matches[currentLabelNumber].length > 1) {
 
-        label.children[0].children[1].children[1].value = matches[0][0];
-        label.children[0].children[3].children[1].value = matches[0][1];
-        label.children[0].children[4].children[1].value = matches[0][2];
+        // Shows the dropdown
+        const dropdown = label.children[0].children[3].children[2];
+        dropdown.style.display = "inline-block"; // Displays the dropdown
+
+        const select = dropdown.getElementsByTagName("select")[0];
+        // Clears all options from the select
+        while (select.firstChild) {
+            select.removeChild(select.lastChild);
+        }
+
+        // Adds options to dropdown
+        for (var i = 0; i < matches[currentLabelNumber].length; i++) {
+        
+            var option = document.createElement("option");
+
+            option.innerHTML = matches[currentLabelNumber][i][0];
+            option.value = matches[currentLabelNumber][i][2];
+
+            select.appendChild(option);   
+        
+        }
+
+        // Sets the dropdown value to the last chromebook in matches
+        select.value = select.lastChild.value;
+
+        // Chooses the last Chromebook in matches (most likely to be the correct one)
+        label.children[0].children[1].children[1].value = matches[currentLabelNumber][matches[currentLabelNumber].length - 1][0];
+        label.children[0].children[3].children[1].value = matches[currentLabelNumber][matches[currentLabelNumber].length - 1][1];
+        label.children[0].children[4].children[1].value = matches[currentLabelNumber][matches[currentLabelNumber].length - 1][2];
+
+    } else if (matches[currentLabelNumber].length > 0) { // Checks if there are any matches
+
+        label.children[0].children[1].children[1].value = matches[currentLabelNumber][0][0];
+        label.children[0].children[3].children[1].value = matches[currentLabelNumber][0][1];
+        label.children[0].children[4].children[1].value = matches[currentLabelNumber][0][2];
     
     } else {
         console.log("No Matching Chromebooks");
@@ -139,29 +176,70 @@ function populateById(label) {
 // Populates some of the data of a label using a device's serial number
 function populateBySerialNumber(label) {
 
+    resetDropdown(label);
+
     var SN = label.children[0].children[4].children[1].value;
+
+    var currentLabelId = label.id;
+    var currentLabelNumber = currentLabelId.replace("label",'');
 
     console.log("Searching for Chromebook by this Serial Number: " + SN);
 
-    matches = []; // Resets match array
+    matches[currentLabelNumber] = []; // Resets match array
 
     for (var i = 0; i < devices.length; i++) {
 
         if (devices[i][2] == SN) {
-            matches.push(devices[i]); // Adds device as a match for the serial number
+            matches[currentLabelNumber].push(devices[i]); // Adds device as a match for the serial number
         }
 
     }
 
-    if (matches.length > 0) { // Checks if there are any matches
+    if (matches[currentLabelNumber].length > 1) {
+        console.log("There is two Chromebooks with the same Serial Number!!!");
+    }
+    if (matches[currentLabelNumber].length > 0) { // Checks if there are any matches
 
-        label.children[0].children[1].children[1].value = matches[0][0];
-        label.children[0].children[3].children[1].value = matches[0][1];
-        label.children[0].children[4].children[1].value = matches[0][2];
+        label.children[0].children[1].children[1].value = matches[currentLabelNumber][0][0];
+        label.children[0].children[3].children[1].value = matches[currentLabelNumber][0][1];
+        label.children[0].children[4].children[1].value = matches[currentLabelNumber][0][2];
     
     } else {
         console.log("No Matching Chromebooks");
     }
+}
+
+// Hides the asset id dropdown
+function resetDropdown(label) {
+
+    const dropdown = label.children[0].children[3].children[2];
+    dropdown.style.display = "none"; // Hides the dropdown
+
+}
+
+function updateDropdownId(label, value) {
+
+    var currentLabelId = label.id;
+    var currentLabelNumber = currentLabelId.replace("label",'');
+
+    console.log("Update Chromebook via Dropdown: " + value)
+
+    var matchIndex; // Index of the match to use
+
+    // Finds the match based on selection
+    for (var i = 0; i < matches[currentLabelNumber].length; i++) {
+        
+        if (matches[currentLabelNumber][i][2] == value) {
+            matchIndex = i;
+        }
+
+    }
+
+    // Changes the inputs based on selection
+    label.children[0].children[1].children[1].value = matches[currentLabelNumber][matchIndex][0];
+    label.children[0].children[3].children[1].value = matches[currentLabelNumber][matchIndex][1];
+    label.children[0].children[4].children[1].value = matches[currentLabelNumber][matchIndex][2];
+
 }
 
 // Retrieves a list of all Chromebooks
