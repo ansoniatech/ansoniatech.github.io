@@ -27,6 +27,11 @@ function newLabel() {
         cloneOfLabelTemplate.id = "label" + lastLabelId;
 
         insertBefore(newLabelButton, cloneOfLabelTemplate);
+        
+        if (lastLabelId == 9) {
+            newLabelButton.remove();
+        }
+
     }
 }
 
@@ -104,7 +109,7 @@ function oauthSignIn() {
 }
 
 // Populates some of the data of a label using a device's id
-function populateById(label, id) {
+function populateById(label) {
 
     var id = label.children[0].children[3].children[1].value;
 
@@ -116,6 +121,34 @@ function populateById(label, id) {
 
         if (devices[i][1] == id) {
             matches.push(devices[i]); // Adds device as a match for the asset-id
+        }
+
+    }
+
+    if (matches.length > 0) { // Checks if there are any matches
+
+        label.children[0].children[1].children[1].value = matches[0][0];
+        label.children[0].children[3].children[1].value = matches[0][1];
+        label.children[0].children[4].children[1].value = matches[0][2];
+    
+    } else {
+        console.log("No Matching Chromebooks");
+    }
+}
+
+// Populates some of the data of a label using a device's serial number
+function populateBySerialNumber(label) {
+
+    var SN = label.children[0].children[4].children[1].value;
+
+    console.log("Searching for Chromebook by this Serial Number: " + SN);
+
+    matches = []; // Resets match array
+
+    for (var i = 0; i < devices.length; i++) {
+
+        if (devices[i][2] == SN) {
+            matches.push(devices[i]); // Adds device as a match for the serial number
         }
 
     }

@@ -35,13 +35,13 @@
                     </li>
                     <li>
                         <p>Asset ID</p>
-                        <input id="asset-id" placeholder="CB-123-45">
+                        <input id="asset-id" oninput="populateById(this.parentNode.parentNode.parentNode)" placeholder="CB-123-45">
 
-                        <button type="button" onclick="populateById(this.parentNode.parentNode.parentNode, 'CB-307-10')">Look Up By Id</button>
+                        <button type="button" onclick="populateById(this.parentNode.parentNode.parentNode)">Look Up By Id</button>
                     </li>
                     <li>
                         <p>S/N</p>
-                        <input id="serial-number" placeholder="ABC1234">
+                        <input id="serial-number" oninput="populateBySerialNumber(this.parentNode.parentNode.parentNode)" placeholder="ABC1234">
                     </li>
                     <li>
                         <p>Extra Info</p>
