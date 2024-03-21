@@ -5,11 +5,13 @@ var clientId = "537591206298-9blrp4f9r00s5uo6rat0phlpmijmf25v.apps.googleusercon
 var clientSecret = "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";
 
 var spreadsheetId = "1wVnZ-ikLlnOH0Lq78cNkp30wW3ukTicgZedR_fmJEXA";
+var touchDictionaryId = "1qPPe1Yk7SGe1jPuMDZxsPJjfW3dpZLe_nuU_eUZWVkA";
 var templateSheetId = "982309210";
 var currentSheetId = "";
 var currentSheetName = "";
 var devices = [];
 var matches = [];
+var dictionary = [];
 
 function insertBefore(referenceNode, newNode) {
 
@@ -47,6 +49,7 @@ function onLoad() {
         window.location = window.location.pathname;
     }
 
+    getModelDictionary();
     getChromebookList();
 
 }
@@ -162,11 +165,15 @@ function populateById(label) {
         label.children[0].children[3].children[1].value = matches[currentLabelNumber][0][1];
         label.children[0].children[4].children[1].value = matches[currentLabelNumber][0][2];
 
+        label.children[0].children[6].children[1].value = isTouchscreen(matches[currentLabelNumber][0][0]);
+
     } else if (matches[currentLabelNumber].length > 0) { // Checks if there are any matches
 
         label.children[0].children[1].children[1].value = matches[currentLabelNumber][0][0];
         label.children[0].children[3].children[1].value = matches[currentLabelNumber][0][1];
         label.children[0].children[4].children[1].value = matches[currentLabelNumber][0][2];
+
+        label.children[0].children[6].children[1].value = isTouchscreen(matches[currentLabelNumber][0][0]);
     
     } else {
         console.log("No Matching Chromebooks");
@@ -203,6 +210,8 @@ function populateBySerialNumber(label) {
         label.children[0].children[1].children[1].value = matches[currentLabelNumber][0][0];
         label.children[0].children[3].children[1].value = matches[currentLabelNumber][0][1];
         label.children[0].children[4].children[1].value = matches[currentLabelNumber][0][2];
+
+        label.children[0].children[6].children[1].value = isTouchscreen(matches[currentLabelNumber][0][0]);
     
     } else {
         console.log("No Matching Chromebooks");
@@ -239,6 +248,23 @@ function updateDropdownId(label, value) {
     label.children[0].children[1].children[1].value = matches[currentLabelNumber][matchIndex][0];
     label.children[0].children[3].children[1].value = matches[currentLabelNumber][matchIndex][1];
     label.children[0].children[4].children[1].value = matches[currentLabelNumber][matchIndex][2];
+
+    label.children[0].children[6].children[1].value = isTouchscreen(matches[currentLabelNumber][matchIndex][0]); 
+
+}
+
+// Returns Yes if a chromebook is found that is touchscreen in the dictionary
+function isTouchscreen(model) {
+
+    for (var i = 0; i < dictionary.length; i++) {
+        
+        if (dictionary[i][0] == model) {
+            return dictionary[i][1];
+        }
+
+    }
+
+    return "No";
 
 }
 
@@ -486,5 +512,37 @@ function populateSheet(dateString) {
 
     })
     .catch(error => console.log(error));
+
+}
+
+function getModelDictionary() {
+
+    console.log("Retrieving Model Dictionary");
+
+    // Authentication
+    var myHeaders = new Headers();
+    var authString = "Bearer " + localStorage.getItem("accessToken");
+    myHeaders.append("Authorization", authString);
+
+    // Settings for GET request
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    var url = "https://sheets.googleapis.com/v4/spreadsheets/" + touchDictionaryId + "/values:batchGet?ranges=A2:B50";
+
+    dictionary = []; // A global array to populate with JSON objects
+
+    fetch(url, requestOptions) // Append the page token to the base URL
+    .then(response => response.json())
+    .then(result => {
+
+        dictionary = result["valueRanges"][0]["values"];
+        console.log("Model Dictionary has been loaded");
+
+    })
+    .catch(error => console.log('error', error));
 
 }
