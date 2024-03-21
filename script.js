@@ -52,6 +52,12 @@ function onLoad() {
     getModelDictionary();
     getChromebookList();
 
+    checkTokenExpiration();
+
+    setInterval(function() {
+        checkTokenExpiration();
+    }, 60 * 1000); // 60 * 1000 milsec
+
 }
 
 // Displays a message for a short period of time
@@ -121,7 +127,7 @@ function populateById(label) {
 
     var id = label.children[0].children[3].children[1].value;
 
-    console.log("Searching for Chromebook by this ID: " + id);
+    // console.log("Searching for Chromebook by this ID: " + id);
 
     matches[currentLabelNumber] = []; // Resets match array for label
 
@@ -176,7 +182,7 @@ function populateById(label) {
         label.children[0].children[6].children[1].value = isTouchscreen(matches[currentLabelNumber][0][0]);
     
     } else {
-        console.log("No Matching Chromebooks");
+        // console.log("No Matching Chromebooks");
     }
 }
 
@@ -190,7 +196,7 @@ function populateBySerialNumber(label) {
     var currentLabelId = label.id;
     var currentLabelNumber = currentLabelId.replace("label",'');
 
-    console.log("Searching for Chromebook by this Serial Number: " + SN);
+    // console.log("Searching for Chromebook by this Serial Number: " + SN);
 
     matches[currentLabelNumber] = []; // Resets match array
 
@@ -214,7 +220,7 @@ function populateBySerialNumber(label) {
         label.children[0].children[6].children[1].value = isTouchscreen(matches[currentLabelNumber][0][0]);
     
     } else {
-        console.log("No Matching Chromebooks");
+        // console.log("No Matching Chromebooks");
     }
 }
 
@@ -541,6 +547,37 @@ function getModelDictionary() {
 
         dictionary = result["valueRanges"][0]["values"];
         console.log("Model Dictionary has been loaded");
+
+    })
+    .catch(error => console.log('error', error));
+
+}
+
+function checkTokenExpiration() {
+
+    // Authentication
+    var myHeaders = new Headers();
+    var authString = "Bearer " + localStorage.getItem("accessToken");
+    myHeaders.append("Authorization", authString);
+
+    // Settings for GET request
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+
+    var url="https://oauth2.googleapis.com/tokeninfo?access_token=" + localStorage.getItem("accessToken");
+
+    fetch(url, requestOptions) // Append the page token to the base URL
+    .then(response => response.json())
+    .then(result => {
+
+        var minutes = Math.floor(result["expires_in"] / 60);
+        
+        const timer = document.getElementById("timer");
+
+        timer.innerHTML = minutes + " Min";
 
     })
     .catch(error => console.log('error', error));

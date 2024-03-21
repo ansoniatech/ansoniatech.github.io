@@ -226,3 +226,9 @@ select:-webkit-autofill:focus {
 ::-webkit-scrollbar-track {
     visibility: hidden;
 }
+
+/* Timer */
+
+.timer {
+    margin: 0px 15px;
+}
