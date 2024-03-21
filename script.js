@@ -431,7 +431,7 @@ function populateSheet(dateString) {
             [inputs[2].value],
             [inputs[3].value],
             [textAreas[1].value],
-            [selection[0].options[selection[0].selectedIndex].text],
+            [selection[selection.length - 1].options[selection[selection.length - 1].selectedIndex].text],
             [dateString]
         ];
 
