@@ -1,5 +1,6 @@
 const labelTemplate = document.getElementById("label0").cloneNode(true); // Clone of initial blank label form for future reference
 var lastLabelId = 0; // The number of the last label id
+var messageBoxLocked = false;
 
 var clientId = "537591206298-9blrp4f9r00s5uo6rat0phlpmijmf25v.apps.googleusercontent.com";
 var clientSecret = "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";
@@ -49,14 +50,17 @@ function onLoad() {
         window.location = window.location.pathname;
     }
 
-    getModelDictionary();
-    getChromebookList();
+    const statusIndicator = document.getElementById("status");
+    statusIndicator.innerHTML = "Console Info Loading...";
 
     checkTokenExpiration();
 
     setInterval(function() {
         checkTokenExpiration();
     }, 60 * 1000); // 60 * 1000 milsec
+
+    getModelDictionary();
+    getChromebookList();
 
 }
 
@@ -65,18 +69,22 @@ function displayMessage(message) {
 
     const messageBox = document.getElementById("message-box");
 
-    messageBox.classList.add("message-box-displayed");
-    messageBox.innerHTML = message;
+    if (!messageBoxLocked) {
+        messageBox.classList.add("message-box-displayed");
+        messageBox.innerHTML = message;
 
-    setTimeout(closeMessage, 5 * 1000); // 5 Seconds
+        setTimeout(closeMessage, 5 * 1000); // 5 Seconds
+    }
 
 }
 
 function closeMessage() {
 
-    const messageBox = document.getElementById("message-box");
+    if (!messageBoxLocked) {
+        const messageBox = document.getElementById("message-box");
 
-    messageBox.classList.remove("message-box-displayed");
+        messageBox.classList.remove("message-box-displayed");
+    }
 
 }
 
@@ -323,7 +331,11 @@ function getChromebookPage(
         }
 
         console.log("Chromebook list has been loaded (" + devices.length + " total)");
-      })
+ 
+        const statusIndicator = document.getElementById("status");
+        statusIndicator.innerHTML = "Console Info Loaded &#10003;";
+
+    })
       .catch(error => console.log('error', error));
   }
 
@@ -573,11 +585,22 @@ function checkTokenExpiration() {
     .then(response => response.json())
     .then(result => {
 
-        var minutes = Math.floor(result["expires_in"] / 60);
-        
         const timer = document.getElementById("timer");
 
-        timer.innerHTML = minutes + " Min";
+        if (result["error"] == "invalid_token") {
+
+            timer.innerHTML = "Please Sign In!"
+
+            const statusIndicator = document.getElementById("status");
+            statusIndicator.innerHTML = "Console Info Can't be Loaded";
+
+        } else {
+
+            var minutes = Math.floor(result["expires_in"] / 60);
+
+            timer.innerHTML = minutes + " Minutes Before Sign Out";
+
+        }
 
     })
     .catch(error => console.log('error', error));

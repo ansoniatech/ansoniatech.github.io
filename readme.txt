@@ -1,7 +1,3 @@
-Add Loading Message for Asset Loading
+This application is for creating labels for shipments to ITurity for the Ansonia Local School District
 
-Add Error Messages for User
-
-Sign In Icon
-
-Reauthentication Token
+Developed March 2024
